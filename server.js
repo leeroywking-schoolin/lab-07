@@ -79,5 +79,5 @@ function searchWeather(query){
 
 function Weather(banana) {
   this.forecast = banana.summary;
-  this.time =  banana.time;
+  this.time =  new Date(banana.time * 1000).toString().slice(0, 15);
 }
