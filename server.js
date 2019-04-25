@@ -67,11 +67,8 @@ function Location(data) {
 
 function searchWeather(query){
   const darkskyData = require('./data/darksky.json');
-  const forecast = [];
-  darkskyData.daily.data.forEach(apple => {
-    console.log(apple.moonPhase);
-    forecast.push(new Weather(apple));
-  })
+  // const forecast = [];
+  const forecast = darkskyData.daily.data.map(apple => new Weather(apple));
 
   // console.log(weather);
   return forecast;
