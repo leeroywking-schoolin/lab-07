@@ -39,7 +39,6 @@ function searchToLatLong(request, response){
     response.send('<h1>HELLO WORLD..</h1>')
   });
 
-// app.get('/weather', getWeather);
 app.get('/weather', (request, response)=>{
   const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
   superagent.get(url)
