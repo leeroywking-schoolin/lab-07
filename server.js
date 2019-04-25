@@ -25,9 +25,9 @@ function searchToLatLong(request, response){
   
   superagent.get(url)
   .then(result => {
-    console.log(result.body.results);
+    // console.log(result.body.results);
     const location = new Location(request.query.data, result) 
-    console.log(location);
+    // console.log(location);
     response.send(location); })
     .catch(err => handleError(err, response));
   }
@@ -41,16 +41,13 @@ function searchToLatLong(request, response){
 
 // app.get('/weather', getWeather);
 app.get('/weather', (request, response)=>{
-  try{
-    console.log('From weather Request', request.query.data.latitude);
-    const locationData = searchWeather(request.query.data.latitude);
-    response.send(locationData);
-  }
-  catch(error){
-    console.error(error);
-    response.status(500).send('Status: 500. So sorry, something went Wrong');
-  }
-  
+  const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
+  superagent.get(url)
+    .then(result => {
+      const weatherResponse = result.body.daily.data.map(day => new Weather(day));
+      response.send(weatherResponse)
+    })
+    .catch(err => handleError(err, response));
 });
 
 
@@ -67,10 +64,13 @@ function Location(query, res) {
   this.longitude = res.body.results[0].geometry.location.lng;
 }
 function searchWeather(query){
-  const darkskyData = require('./data/darksky.json');
-  const forecast = darkskyData.daily.data.map(apple => new Weather(apple));
+  console.log('here is the query ' +query);
+  // const latlong = query[0].
+  const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latlong}`
+  // const darkskyData = require('./data/darksky.json');
+  // const forecast = darkskyData.daily.data.map(apple => new Weather(apple));
 
-  return forecast;
+  // return forecast;
 }
 
 function Weather(banana) {
