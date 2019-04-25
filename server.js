@@ -13,10 +13,6 @@ app.use(cors()); //tell express to use cors
 
 const PORT = process.env.PORT;
 
-app.get('/testing', (request, response)=>{
-  console.log('found the testing route')
-  response.send('<h1>HELLO WORLD..</h1>')
-});
 
 app.get('/location', searchToLatLong);
 
@@ -28,15 +24,20 @@ function searchToLatLong(request, response){
   console.log(request.query.data);
   
   superagent.get(url)
-  .then(resultJSON => {
-    const location = new Location(resultJSON.query.data, result) 
+  .then(result => {
+    console.log(result.body.results);
+    const location = new Location(request.query.data, result) 
     console.log(location);
     response.send(location); })
-  .catch(err => handleError(err, response));
-}
-
-
-
+    .catch(err => handleError(err, response));
+  }
+  
+  
+  
+  app.get('/testing', (request, response)=>{
+    console.log('found the testing route')
+    response.send('<h1>HELLO WORLD..</h1>')
+  });
 
 // app.get('/weather', getWeather);
 app.get('/weather', (request, response)=>{
@@ -49,7 +50,7 @@ app.get('/weather', (request, response)=>{
     console.error(error);
     response.status(500).send('Status: 500. So sorry, something went Wrong');
   }
-
+  
 });
 
 
@@ -58,13 +59,13 @@ app.get('/weather', (request, response)=>{
 //Helper Functions
 
 // Constructor for location data
+
 function Location(query, res) {
   this.search_query = query
   this.formatted_query = res.body.results[0].formatted_address;
   this.latitude = res.body.results[0].geometry.location.lat;
   this.longitude = res.body.results[0].geometry.location.lng;
 }
-
 function searchWeather(query){
   const darkskyData = require('./data/darksky.json');
   const forecast = darkskyData.daily.data.map(apple => new Weather(apple));
@@ -75,4 +76,8 @@ function searchWeather(query){
 function Weather(banana) {
   this.forecast = banana.summary;
   this.time =  new Date(banana.time * 1000).toString().slice(0, 15);
+}
+function handleError(err, response) {
+  console.error(err);
+  if (response) response.status(500).send('nope');
 }
