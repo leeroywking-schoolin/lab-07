@@ -19,9 +19,9 @@ app.get('/location', searchToLatLong);
 app.listen(PORT, ()=>console.log(`Listening on PORT ${PORT}`));
 
 function searchToLatLong(request, response){
-  console.log('this function has been called');
+  // console.log('this function has been called');
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`
-  console.log(request.query.data);
+  // console.log(request.query.data);
   
   superagent.get(url)
   .then(result => {
@@ -31,9 +31,6 @@ function searchToLatLong(request, response){
     response.send(location); })
     .catch(err => handleError(err, response));
   }
-  
-  
-  
   app.get('/testing', (request, response)=>{
     console.log('found the testing route')
     response.send('<h1>HELLO WORLD..</h1>')
@@ -49,7 +46,18 @@ app.get('/weather', (request, response)=>{
     .catch(err => handleError(err, response));
 });
 
-
+app.get('/events', (request, response) => {
+  const url = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${request.query.data.longitude}&location.latitude=${request.query.data.latitude}&expand=venue&token=${process.env.EVENTBRITE_API_KEY}`;
+  // console.log(url);
+  superagent.get(url)
+  .then(result => {
+    console.log(result.body.events[0]);
+    const eventResponse = result.body.events.map( result => new Events(result));
+    response.send(eventResponse) 
+  
+  })
+  .catch(err => handleError(err, response));
+});
 
 
 //Helper Functions
@@ -62,20 +70,22 @@ function Location(query, res) {
   this.latitude = res.body.results[0].geometry.location.lat;
   this.longitude = res.body.results[0].geometry.location.lng;
 }
-function searchWeather(query){
-  console.log('here is the query ' +query);
-  // const latlong = query[0].
-  const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latlong}`
-  // const darkskyData = require('./data/darksky.json');
-  // const forecast = darkskyData.daily.data.map(apple => new Weather(apple));
 
-  // return forecast;
+function Events(query){
+  this.eventData = query.events;
+  this.link = query.url;
+  this.name = query.name.text;
+  this.event_date = query.start.local;
+  this.summary = query.summary;
+  console.log(this);
 }
 
 function Weather(banana) {
   this.forecast = banana.summary;
   this.time =  new Date(banana.time * 1000).toString().slice(0, 15);
 }
+
+
 function handleError(err, response) {
   console.error(err);
   if (response) response.status(500).send('nope');
