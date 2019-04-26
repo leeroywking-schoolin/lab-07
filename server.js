@@ -47,7 +47,7 @@ app.get('/events', (request, response) => {
   superagent.get(url)
   .then(result => {
     const eventResponse = result.body.events.map( result => new Events(result));
-    response.send(eventResponse) 
+    response.send(eventResponse.slice(0,20)) 
   })
   .catch(err => handleError(err, response));
 });
