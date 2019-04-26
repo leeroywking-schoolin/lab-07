@@ -19,15 +19,11 @@ app.get('/location', searchToLatLong);
 app.listen(PORT, ()=>console.log(`Listening on PORT ${PORT}`));
 
 function searchToLatLong(request, response){
-  // console.log('this function has been called');
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`
-  // console.log(request.query.data);
   
   superagent.get(url)
   .then(result => {
-    // console.log(result.body.results);
     const location = new Location(request.query.data, result) 
-    // console.log(location);
     response.send(location); })
     .catch(err => handleError(err, response));
   }
@@ -48,13 +44,10 @@ app.get('/weather', (request, response)=>{
 
 app.get('/events', (request, response) => {
   const url = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${request.query.data.longitude}&location.latitude=${request.query.data.latitude}&expand=venue&token=${process.env.EVENTBRITE_API_KEY}`;
-  // console.log(url);
   superagent.get(url)
   .then(result => {
-    console.log(result.body.events[0]);
     const eventResponse = result.body.events.map( result => new Events(result));
     response.send(eventResponse) 
-  
   })
   .catch(err => handleError(err, response));
 });
@@ -75,9 +68,8 @@ function Events(query){
   this.eventData = query.events;
   this.link = query.url;
   this.name = query.name.text;
-  this.event_date = query.start.local;
+  this.event_date = query.start.local.slice(0,10);
   this.summary = query.summary;
-  console.log(this);
 }
 
 function Weather(banana) {
