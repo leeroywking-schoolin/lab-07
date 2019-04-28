@@ -135,7 +135,7 @@ function getEvents( request, response){
         const eventResponse = result.body.events.map(result => {
           const newEvent = new Events(result);
           newEvent.id = query;
-          let newSQL = `INSERT INTO EVENTS (eventdata, link, event_data, summary, location_id) VALUES($1,$2,$3,$4,$5);`;
+          let newSQL = `INSERT INTO EVENTS (eventdata, link, eventName, event_date, summary, location_id) VALUES($1,$2,$3,$4,$5,$6);`;
           let newValue = Object.values(newEvent);
           client.query(newSQL, newValue)
           return newEvent
@@ -160,7 +160,7 @@ function Location(query, res) {
 function Events(query) {
   this.eventData = query.events;
   this.link = query.url;
-  this.name = query.name.text;
+  this.eventName = query.name.text;
   this.event_date = query.start.local.slice(0, 10);
   this.summary = query.summary;
 }

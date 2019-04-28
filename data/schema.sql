@@ -27,7 +27,8 @@ CREATE TABLE events(
     id SERIAL PRIMARY KEY,
     eventdata VARCHAR(255),
     link VARCHAR(255),
-    event_data VARCHAR(255),
+    eventName VARCHAR(255),
+    event_date VARCHAR(255),
     summary VARCHAR(255),
     location_id INTEGER NOT NULL, 
     FOREIGN KEY(location_id) REFERENCES locations (id)
